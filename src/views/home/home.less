@@ -1,0 +1,73 @@
+.el-container{
+  height: 100%;
+}
+.el-header{
+  padding: 0 38px;
+  height: 80px !important;
+  line-height: 80px;
+  background-color: #002140;
+  display: flex;
+  justify-content: space-between;
+  align-content: center;
+  i{
+    cursor: pointer;
+    display: inline-block;
+    height: 80px;
+    line-height: 80px;
+    padding: 0 25px 0 10px;
+    margin-left: 15px;
+  }
+  span,i{
+    font-size:20px;
+    color:#fff;
+  }
+  .el-dropdown-link{
+    img{
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+    }
+  }
+
+}
+.el-aside{
+  padding-top: 30px;
+  background-color: #001529;
+  .el-menu{
+    border-right: 0;
+    i{
+      font-size: 20px;
+      color: #fff;
+      margin-right: 13px;
+    }
+  }
+}
+.el-main{
+  background-color: #eaedf1;
+}
+
+
+
+.el-menu--vertical i{
+  font-size: 20px;
+  color: #fff;
+  margin-right: 13px;
+}
+// 重置element-ui Dropdown组件样式
+.el-dropdown-menu{
+  background: #002140;
+  margin: 0;
+  .el-dropdown-menu__item{
+   color: #fff;
+  }
+}
+.el-popper[x-placement^=bottom]{
+  margin: 0 !important;
+  .popper__arrow{
+    top: -29px;
+  }
+}
+.el-dropdown-menu__item:focus, .el-dropdown-menu__item:not(.is-disabled):hover {
+  background-color: transparent;
+  color: #409EFF;
+}

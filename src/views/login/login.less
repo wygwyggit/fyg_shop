@@ -1,36 +1,64 @@
 .login_wrap{
   height: 100%;
-  background: url('./images/banner_1.jpg') no-repeat left top/100% 100%;
- .login_box{
-  width: 450px;
-  height: 300px;
-   position: absolute;
-   top: 50%;
-   left: 50%;
-   transform: translate(-50%,-50%);
-   background: rgba(255, 255, 255, .8);
-   border-radius: 5px;
-   .avatar_box {
-
-    border: 1px solid #eee;
-    padding: 10px;
-    box-shadow: 0 0 10px #ddd;
-    position: absolute;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: #fff;
-    img {
-      width: 100%;
-      height: 100%;
-      background-color: #eee;
+  background: url('./images/banner.jpg') no-repeat left top/100% 100%;
+  .login_header{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 80px;
+    line-height: 80px;
+    background: rgba(21, 20, 13, 0.9);
+    .logo{
+      padding-left: 100px;
+      font-size: 20px;
+      color: #fff;
     }
   }
+
+  .login_content{
+    position: relative;
+    top: 40%;
+    display: flex;
+    padding: 0 20px;
+    display: flex;
+    max-width: 900px;
+    margin: 0 auto;
+    .word{
+      color: #fff;
+      font-size: 68px;
+      flex: 7 1;
+      line-height: 1.4;
+      color: #fff;
+      font-weight: bold;
+    }
+  }
+ .login_box{
+  width: 400px;
+  height: 400px;
+   position: absolute;
+   top: 50%;
+   left: 60%;
+   transform: translate(0,-50%);
+   background: rgba(255, 255, 255, 1);
+   border-radius: 5px;
+   .login_title{
+    width: 400px;
+    height: 80px;
+    border-radius: 0 0 60px 60px;
+    background-color: #3f87ff;
+    line-height: 80px;
+    text-align: center;
+    color: #fff;
+    font-size: 24px;
+    font-weight: 700;
+   }
  }
  .login_Form{
    position: absolute;
    width: 100%;
-   bottom: 0;
-   padding: 15px;
+   top: 120px;
+   padding: 0 35px ;
    box-sizing: border-box;
    .item{
     display: flex;
@@ -54,5 +82,18 @@
       }
    }
    
+ }
+ .footer{
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
+  line-height: 60px;
+  background: rgba(21, 23, 20, 0.5);
+  font-size: 12px;
+  letter-spacing: 0.15em;
+    color: #d7d7d7;
+    text-align: center;
  }
 }
