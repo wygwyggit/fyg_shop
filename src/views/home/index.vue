@@ -29,6 +29,8 @@
       unique-opened
       :collapse="isCollapse"
       :collapse-transition="false"
+      router
+      :default-active="activePath"
       >
        <!-- 一级菜单 -->
       <el-submenu :index="menu.id+''" v-for='menu in menuList' :key="menu.id">
@@ -37,7 +39,7 @@
           <span>{{menu.authName}}</span>
         </template>
          <!-- 二级菜单 -->
-         <el-menu-item :index="subMenu.id+''" v-for="subMenu in menu.children" :key="subMenu.id">
+         <el-menu-item :index="'/'+subMenu.path" v-for="subMenu in menu.children" :key="subMenu.id" @click="getPath('/'+subMenu.path)">
            <i class="iconfont iconleimupinleifenleileibie"></i>
            <span>{{subMenu.authName}}</span>
           </el-menu-item>
@@ -45,7 +47,9 @@
     </el-menu>
     </el-aside>
     <el-container>
-      <el-main>Main</el-main>
+      <el-main>
+        <router-view></router-view>
+      </el-main>
     </el-container>
   </el-container>
     </el-container>
@@ -63,7 +67,8 @@ export default {
       '101': 'iconfont iconshangpin-tianchong',
       '102': 'iconfont icondingdan',
       '145': 'iconfont icontianchongxing-'
-    }
+    },
+    activePath: sessionStorage.getItem('activePath') || ''
   }),
   computed: {
     width () {
@@ -99,10 +104,13 @@ export default {
      if (command === 'loginout') {
        this.loginout()
      }
+   },
+   getPath (path) {
+      sessionStorage.setItem('activePath', path)
    }
   }
 }
 </script>
 <style lang="less" scoped>
- @import "home.less";
+ @import "index.less";
 </style>

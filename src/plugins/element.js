@@ -16,7 +16,18 @@ import {
     Submenu,
     Dropdown,
     DropdownMenu,
-    DropdownItem
+    DropdownItem,
+    Breadcrumb,
+    BreadcrumbItem,
+    Card,
+    Row,
+    Col,
+    Table,
+    TableColumn,
+    Switch,
+    Tooltip,
+    Pagination,
+    Dialog
 } from 'element-ui'
 Vue
     .use(Button)
@@ -34,4 +45,15 @@ Vue
     .use(Dropdown)
     .use(DropdownMenu)
     .use(DropdownItem)
+    .use(Breadcrumb)
+    .use(BreadcrumbItem)
+    .use(Card)
+    .use(Row)
+    .use(Col)
+    .use(Table)
+    .use(TableColumn)
+    .use(Switch)
+    .use(Tooltip)
+    .use(Pagination)
+    .use(Dialog)
 Vue.prototype.$msg = Message
