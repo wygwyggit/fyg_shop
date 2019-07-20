@@ -17,7 +17,7 @@
          <el-col :span="4"><el-button type="primary" @click="addDialogVisible = true">添加管理员</el-button></el-col>
        </el-row>
         <el-table :data="users" style="width: 100%" border stripe>
-            <el-table-column prop="username"    label="姓名" width="180"></el-table-column>
+            <el-table-column prop="username"    label="用户名" width="180"></el-table-column>
             <el-table-column prop="email"       label="邮箱" width="180"></el-table-column>
             <el-table-column prop="mobile"      label="手机"></el-table-column>
             <el-table-column prop="role_name"   label="角色"></el-table-column>
@@ -30,9 +30,9 @@
                   </template>
             </el-table-column>
             <el-table-column label="操作">
-                  <template >
-                      <el-button type="primary" icon="el-icon-edit" size="mini"></el-button>
-                      <el-button type="danger" icon="el-icon-delete" size="mini"></el-button>
+                  <template v-slot:default="slotProps">
+                      <el-button type="primary" icon="el-icon-edit" size="mini" @click="editUser(slotProps.row)"></el-button>
+                      <el-button type="danger" icon="el-icon-delete" size="mini" @click="delUser(slotProps.row.id)" ></el-button>
                        <el-tooltip class="item" effect="dark" content="分配角色" placement="top-start" :enterable="false">
                               <el-button type="warning" icon="el-icon-setting" size="mini"></el-button>
                       </el-tooltip>
@@ -75,6 +75,28 @@
         <el-button type="primary" @click='addUser'>确 定</el-button>
       </span>
     </el-dialog>
+
+    <!-- 编辑管理员 -->
+    <el-dialog
+  title="编辑管理员"
+  :visible.sync="editDialogVisible"
+  width="50%" @close='editDialogClosed'>
+  <el-form :model="editForm" :rules="editFormRule" ref="editForm" label-width="80px"  >
+        <el-form-item label="用户名" prop="username">
+          <el-input v-model="editForm.username" disabled></el-input>
+        </el-form-item>
+         <el-form-item label="邮箱" prop="email">
+          <el-input v-model="editForm.email"></el-input>
+        </el-form-item>
+         <el-form-item label="手机号" prop="mobile">
+          <el-input v-model="editForm.mobile" maxlength='11'></el-input>
+        </el-form-item>
+      </el-form>
+  <span slot="footer" class="dialog-footer">
+    <el-button @click="editDialogVisible = false">取 消</el-button>
+    <el-button type="primary" @click="editUserfn">确 定</el-button>
+  </span>
+</el-dialog>
   </div>
 </template>
 <script>
@@ -105,12 +127,14 @@ export default {
       pagesize: 5
     },
     addDialogVisible: false,
+    editDialogVisible: false,
     addForm: {
       username: '',
       password: '',
       email: '',
       mobile: ''
     },
+    editForm: {},
     // 检验表单规则
     addFormRule: {
      username: [
@@ -120,6 +144,21 @@ export default {
       password: [
          { required: true, message: '请输输入密码', trigger: 'blur' },
          { min: 3, max: 10, message: '长度在 3 到 10 个字符', trigger: 'blur' }
+     ],
+     email: [
+       { required: true, message: '请输输入邮箱', trigger: 'blur' },
+        { validator: checkEmail, trigger: 'blur' }
+     ],
+     mobile: [
+         { required: true, message: '请输输入手机号', trigger: 'blur' },
+        { validator: checkMobile, trigger: 'blur' }
+     ]
+    },
+     // 检验表单规则
+    editFormRule: {
+     username: [
+         { required: true, message: '请输入用户名', trigger: 'blur' },
+         { min: 3, max: 8, message: '长度在 3 到 8 个字符', trigger: 'blur' }
      ],
      email: [
        { required: true, message: '请输输入邮箱', trigger: 'blur' },
@@ -187,6 +226,57 @@ export default {
           this.nprogress.done()
           this.addDialogVisible = false
        })
+     },
+     // 关闭编辑管理员弹窗重置
+     editDialogClosed () {
+        this.$refs.editForm.resetFields()
+     },
+     // 编辑管理员信息显示信息
+     editUser (info) {
+       this.editDialogVisible = true
+       this.editForm = {
+         id: info.id,
+         username: info.username,
+         email: info.email,
+         mobile: info.mobile
+       }
+     },
+
+     // 编辑管理员信息
+    async editUserfn () {
+      this.nprogress.start()
+       const { data: { meta } } = await this.$http.put('users/' + this.editForm.id, this.editForm)
+        if (meta.status !== 200) {
+          this.$msg.error(meta.msg)
+          this.getUsers()
+        } else {
+           this.$msg.success(meta.msg)
+        }
+         this.editDialogVisible = false
+         this.nprogress.done()
+     },
+     // 删除管理员
+     delUser (id) {
+       this.$comfirm('此操作将永久删除该管理员, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(async () => {
+           this.nprogress.start()
+          const { data: { data, meta } } = await this.$http.delete('users/' + id)
+          if (meta.status !== 200) {
+            this.$msg.error(meta.msg)
+          } else {
+            this.getUsers()
+            this.$msg.success(meta.msg)
+            this.nprogress.done()
+          }
+        }).catch(() => {
+          this.$msg({
+            type: 'info',
+            message: '已取消删除'
+          })
+        })
      }
   }
 }

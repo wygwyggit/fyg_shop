@@ -105,6 +105,7 @@ export default {
        this.loginout()
      }
    },
+   // 获取点击菜单状态高亮显示
    getPath (path) {
       sessionStorage.setItem('activePath', path)
    }
