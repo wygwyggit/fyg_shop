@@ -33,8 +33,8 @@
                   <template v-slot:default="slotProps">
                       <el-button type="primary" icon="el-icon-edit" size="mini" @click="editUser(slotProps.row)"></el-button>
                       <el-button type="danger" icon="el-icon-delete" size="mini" @click="delUser(slotProps.row.id)" ></el-button>
-                       <el-tooltip class="item" effect="dark" content="分配角色" placement="top-start" :enterable="false">
-                              <el-button type="warning" icon="el-icon-setting" size="mini"></el-button>
+                       <el-tooltip class="item" effect="dark" content="分配角色" placement="top-start" :enterable="false" >
+                              <el-button type="warning" icon="el-icon-setting" size="mini" @click="fppower(slotProps.row)"></el-button>
                       </el-tooltip>
                   </template>
             </el-table-column>
@@ -77,26 +77,46 @@
     </el-dialog>
 
     <!-- 编辑管理员 -->
-    <el-dialog
-  title="编辑管理员"
-  :visible.sync="editDialogVisible"
-  width="50%" @close='editDialogClosed'>
-  <el-form :model="editForm" :rules="editFormRule" ref="editForm" label-width="80px"  >
-        <el-form-item label="用户名" prop="username">
-          <el-input v-model="editForm.username" disabled></el-input>
-        </el-form-item>
-         <el-form-item label="邮箱" prop="email">
-          <el-input v-model="editForm.email"></el-input>
-        </el-form-item>
-         <el-form-item label="手机号" prop="mobile">
-          <el-input v-model="editForm.mobile" maxlength='11'></el-input>
-        </el-form-item>
-      </el-form>
-  <span slot="footer" class="dialog-footer">
-    <el-button @click="editDialogVisible = false">取 消</el-button>
-    <el-button type="primary" @click="editUserfn">确 定</el-button>
-  </span>
-</el-dialog>
+        <el-dialog
+      title="编辑管理员"
+      :visible.sync="editDialogVisible"
+      width="50%" @close='editDialogClosed'>
+      <el-form :model="editForm" :rules="editFormRule" ref="editForm" label-width="80px"  >
+            <el-form-item label="用户名" prop="username">
+              <el-input v-model="editForm.username" disabled></el-input>
+            </el-form-item>
+            <el-form-item label="邮箱" prop="email">
+              <el-input v-model="editForm.email"></el-input>
+            </el-form-item>
+            <el-form-item label="手机号" prop="mobile">
+              <el-input v-model="editForm.mobile" maxlength='11'></el-input>
+            </el-form-item>
+          </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="editDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="editUserfn">确 定</el-button>
+      </span>
+    </el-dialog>
+
+     <!-- 分配权限 -->
+        <el-dialog
+      title="分配角色"
+      :visible.sync="fqDialogVisible"
+      width="40%"
+      @close='closefp'>
+       <div>
+        <p class="p_item">当前的用户：{{currentUser.username}}</p>
+        <p class="p_item">当前的角色：<span class="powerTxt">{{currentUser.role_name}}</span></p>
+        <p class="p_item">分配新角色：
+              <el-radio v-for="data in rolelist" :label="data.id" :key="data.id" v-model="roleId" >{{data.roleName}} </el-radio >
+        </p>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="fqDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="changeUserPower">确 定</el-button>
+      </span>
+    </el-dialog>
+
   </div>
 </template>
 <script>
@@ -128,6 +148,7 @@ export default {
     },
     addDialogVisible: false,
     editDialogVisible: false,
+    fqDialogVisible: false,
     addForm: {
       username: '',
       password: '',
@@ -168,7 +189,14 @@ export default {
          { required: true, message: '请输输入手机号', trigger: 'blur' },
         { validator: checkMobile, trigger: 'blur' }
      ]
-    }
+    },
+    // 当前分配角色的用户数据
+    currentUser: {},
+    rolelist: [],
+    roleId: '',
+    // 分配权限的ID
+    userId: ''
+
   }),
   created () {
     this.getUsers()
@@ -277,9 +305,62 @@ export default {
             message: '已取消删除'
           })
         })
+     },
+     // 分配角色
+    async fppower (role) {
+       this.fqDialogVisible = true
+       this.currentUser = role
+       this.userId = role.id
+       this.nprogress.start()
+       const { data: { data, meta } } = await this.$http.get('roles')
+        if (meta.status !== 200) {
+          this.$msg.error(meta.msg)
+        } else {
+          console.log(data)
+          this.rolelist = data
+        }
+        this.nprogress.done()
+     },
+     // 修改用户角色
+    async changeUserPower () {
+       // 如果没有修改角色不发起请求
+       if (!this.roleId) {
+         this.$msg.info('该管理员未修改角色')
+         this.fqDialogVisible = false
+         return
+       }
+        this.nprogress.start()
+        const { data: { data, meta } } = await this.$http.put(`users/${this.userId}/role`, {
+          rid: this.roleId
+        })
+        if (meta.status !== 200) {
+          this.$msg.error(meta.msg)
+        } else {
+          // 刷新数据
+          this.getUsers()
+          this.fqDialogVisible = false
+           this.$msg.success(meta.msg)
+        }
+        this.nprogress.done()
+     },
+     // 关闭分配角色弹框恢复单选框
+     closefp () {
+       this.roleId = ''
      }
   }
 }
 </script>
-<style >
+<style lang="less" scoped>
+.p_item{
+  line-height: 40px;
+}
+.powerTxt{
+  display: inline-block;
+  padding: 0 6px;
+  line-height: 30px;
+  border-radius: 3px;
+  background-color: #001529;
+  color: #fff;
+  font-size: 12px;
+}
 </style>
