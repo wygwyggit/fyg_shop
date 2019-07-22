@@ -13,7 +13,8 @@ module.exports = {
         "no-tabs": "off",
         "indent": "off",
         "eol-last": "off",
-        "no-unused-vars": "off"
+        "no-unused-vars": "off",
+        "space-before-function-paren": "off"
     },
     parserOptions: {
         parser: 'babel-eslint'

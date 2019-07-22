@@ -125,7 +125,7 @@ export default {
        ...this.$refs.treeRef.getCheckedKeys(),
        ...this.$refs.treeRef.getHalfCheckedKeys()
      ]
-     const keyStr = keys.join(',')
+      const keyStr = keys.join(',')
       this.nprogress.start()
      const { data: { meta } } = await this.$http.post(`roles/${this.roleId}/rights`, {
        rids: keyStr
@@ -133,7 +133,7 @@ export default {
      if (meta.status !== 200) {
         this.$msg.error(meta.msg)
      } else {
-        this.$msg.success('成功')
+       this.$msg.success('成功')
        this.getRoleList()
        this.rightdialogVisible = false
      }

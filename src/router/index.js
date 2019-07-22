@@ -6,6 +6,8 @@ import Welcome from '../views/home/welcome/welcome.vue'
 import Users from '../views/home/users'
 import Rights from '../views/power/rights'
 import Roles from '../views/power/roles'
+import Cate from '../views/goods/cate'
+import Params from '../views/goods/params'
 import { root } from 'postcss-selector-parser'
 // 导入进度条模块
 import NProgress from '../plugins/nprogress.js'
@@ -35,6 +37,12 @@ const router = new Router({
             }, {
                 path: '/roles',
                 component: Roles
+            }, {
+                path: '/categories',
+                component: Cate
+            }, {
+                path: '/params',
+                component: Params
             }]
         }]
     })

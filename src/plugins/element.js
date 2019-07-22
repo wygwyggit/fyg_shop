@@ -31,7 +31,11 @@ import {
     MessageBox,
     Tag,
     Tree,
-    Radio
+    Radio,
+    Cascader,
+    Alert,
+    Tabs,
+    TabPane
 } from 'element-ui'
 Vue
     .use(Button)
@@ -63,5 +67,10 @@ Vue
     .use(Tag)
     .use(Tree)
     .use(Radio)
+    .use(Cascader)
+    .use(Alert)
+    .use(Tabs)
+    .use(TabPane)
 Vue.prototype.$msg = Message
+Vue.prototype.$alert = MessageBox.alert
 Vue.prototype.$comfirm = MessageBox.confirm
