@@ -31,26 +31,37 @@
          </template>
       </zk-table>
       <!-- 分页区 -->
+       <el-pagination
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
+      :current-page="queryInfo.pagenum"
+      :page-sizes="[5, 10, 15]"
+      :page-size="queryInfo.pagesize"
+      layout="total, sizes, prev, pager, next, jumper"
+      :total="total">
+    </el-pagination>
    </el-card>
 
    <!-- 添加分类 -->
     <el-dialog
         title="添加分类"
         :visible.sync="addCateDialogVisible"
-        width="40%">
-        <el-form :model="addCateForm" :rules="addCateFormRules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+        width="40%"
+        @close='closeAddCate'>
+        <el-form :model="addCateForm" :rules="addCateFormRules" ref="addCateRef" label-width="100px" class="demo-ruleForm">
           <el-form-item label="分类名称" prop="cat_name">
             <el-input v-model="addCateForm.cat_name"></el-input>
           </el-form-item>
             <el-form-item label="上级分类">
+              <!-- props 用来指定配置对象 -->
                   <el-cascader
-                    expand-trigger="hover"
+                    props.expandTrigger="hover"
                     :options="parentCateList"
                     v-model="selectedCate"
                     :props="cascaderProps"
                     @change="selectedCateChange"
                     clearable
-                    change-on-select>
+                    props.checkStrictly>
                   </el-cascader>
            </el-form-item>
         </el-form>
@@ -68,7 +79,7 @@ export default {
     parentCateList: [],
     selectedCate: [],
     cascaderProps: {
-       value: 'cat_id',
+        value: 'cat_id',
         label: 'cat_name',
         children: 'children'
     },
@@ -98,12 +109,16 @@ export default {
     queryInfo: {
       type: 3,
       pagenum: 1,
-      pagesize: 8
+      pagesize: 5
     },
+    total: 0,
     addCateDialogVisible: false,
     addCateForm: {
+      // 分类的父ID
       cat_pid: 0,
+      // 分类的名称
       cat_name: '',
+      // 分类的等级
       cat_level: 0
     },
     addCateFormRules: {
@@ -117,21 +132,26 @@ export default {
   },
   methods: {
    async getcategoriList () {
-     this.nprogress.start()
      const { data: { data, meta } } = await this.$http.get('categories', {
         params: this.queryInfo
       })
        if (meta.status !== 200) {
-        this.$msg.error(meta.msg)
-     } else {
-       this.cateList = data.result
+       return this.$msg.error(meta.msg)
      }
-      this.nprogress.done()
+      this.cateList = data.result
+      this.total = data.total
     },
     // 打开添加分类弹窗
     addCate () {
       this.getParentCateList()
       this.addCateDialogVisible = true
+    },
+    // 关闭添加分类弹窗
+    closeAddCate() {
+      this.$refs.addCateRef.resetFields()
+      this.selectedCate = []
+      this.addCateForm.cat_pid = 0
+      this.addCateForm.cat_level = 0
     },
        // 获取父级分类的数据列表
     async getParentCateList () {
@@ -148,10 +168,36 @@ export default {
     },
     selectedCateChange () {
         console.log(this.selectedCate)
+        if (this.selectedCate.length) {
+          this.addCateForm.cat_pid = this.selectedCate[this.selectedCate.length - 1]
+          this.addCateForm.cat_level = this.selectedCate.length
+        } else {
+          this.addCateForm.cat_pid = 0
+          this.addCateForm.cat_level = 0
+        }
+    },
+    handleSizeChange(newSize) {
+      this.queryInfo.pagesize = newSize
+      this.getcategoriList()
+    },
+    handleCurrentChange(newPage) {
+      this.queryInfo.pagenum = newPage
+       this.getcategoriList()
     },
     // 添加分类
     addCatefn () {
-
+      console.log(this.addCateForm)
+      // 校验数据
+      this.$refs.addCateRef.validate(async valid => {
+        if (!valid) return false
+        const { data: { data, meta } } = await this.$http.post('categories', this.addCateForm)
+        if (meta.status !== 201) {
+          return this.$msg.error(meta.msg)
+        }
+        this.$msg.success('添加分类成功')
+        this.getcategoriList()
+        this.addCateDialogVisible = false
+      })
     }
   }
 }
@@ -159,5 +205,8 @@ export default {
 <style lang="less">
 .zk-table{
   margin:20px 0;
+}
+.el-cascader{
+  width: 100%;
 }
 </style>

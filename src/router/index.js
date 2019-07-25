@@ -10,6 +10,8 @@ import Cate from '../views/goods/cate'
 import Params from '../views/goods/params'
 import List from '../views/goods/list'
 import Add from '../views/goods/add'
+import Orders from '../views/orders'
+import Reports from '../views/reports'
 import { root } from 'postcss-selector-parser'
 // 导入进度条模块
 import NProgress from '../plugins/nprogress.js'
@@ -51,6 +53,12 @@ const router = new Router({
             }, {
                 path: '/goods/add',
                 component: Add
+            }, {
+                path: '/orders',
+                component: Orders
+            }, {
+                path: '/reports',
+                component: Reports
             }]
         }]
     })
