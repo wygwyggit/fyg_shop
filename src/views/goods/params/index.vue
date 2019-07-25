@@ -29,7 +29,23 @@
             <el-tab-pane label="动态参数" name="many">
                <el-button type="primary" size='mini' :disabled="isBtnDisabled" @click="addParams">添加参数</el-button>
                <el-table :data="manyTableData" style="width: 100%">
-                  <el-table-column type="expand"></el-table-column>
+                  <el-table-column type="expand">
+                    <template v-slot:default='slotProps'>
+                      <el-tag v-for="(item, index) in slotProps.row.attr_vals" :key="index" closable @close='handleclose(index,slotProps.row)'>
+                         {{item}}
+                      </el-tag>
+                      <el-input
+                      v-if="slotProps.row.inputVisible"
+                      v-model="slotProps.row.inputValue"
+                      ref="saveTagInput"
+                      size="small"
+                      @keyup.enter.native="handleInputConfirm(slotProps.row)"
+                      @blur="handleInputConfirm(slotProps.row)"
+                    >
+                    </el-input>
+                    <el-button v-else class="button-new-tag" size="small" @click="showInput(slotProps.row)">+ 添加</el-button>
+                  </template>
+                  </el-table-column>
                   <el-table-column type="index"></el-table-column>
                   <el-table-column prop="attr_name" label="参数名称" ></el-table-column>
                   <el-table-column >
@@ -190,6 +206,11 @@ computed: {
         if (meta.status !== 200) {
           return this.$msg.error('获取失败')
         }
+        data.forEach(element => {
+          element.attr_vals = element.attr_vals ? element.attr_vals.split(' ') : []
+          element.inputVisible = false
+          element.inputValue = ''
+        })
         // 判断进行相对应的赋值数据
         if (this.activeName === 'many') {
           this.manyTableData = data
@@ -276,6 +297,44 @@ computed: {
           //   message: '已取消删除'
           // })
         })
+    },
+
+    // 文本框失去焦点
+    async handleInputConfirm(role) {
+      if (role.inputValue.trim().length === 0) {
+        role.inputValue = ''
+         role.inputVisible = false
+         return false
+      }
+      // 输入内容合法,发起请求
+       role.attr_vals.push(role.inputValue.trim())
+      this.saveAttrVals(role.attr_vals, role)
+      role.inputVisible = false
+      role.inputValue = ''
+    },
+    // 点击按钮展示文本输入框
+    showInput (role) {
+      // 让文本框自动获取焦点
+      role.inputVisible = true
+      this.$nextTick(_ => {
+          this.$refs.saveTagInput.$refs.input.focus()
+        })
+    },
+    // 删除参数选项
+    handleclose(index, role) {
+       role.attr_vals.splice(index, 1)
+       this.saveAttrVals(role.attr_vals, role)
+    },
+   async saveAttrVals(vals, role) {
+       const { data: { data, meta } } = await this.$http.put(`categories/${this.cateId}/attributes/${role.attr_id}`, {
+        attr_name: role.attr_name,
+        attr_sel: role.attr_sel,
+        attr_vals: vals.join(' ')
+        })
+        if (meta.status !== 200) {
+          return this.$msg.error(meta.msg)
+        }
+        this.$msg.success(meta.msg)
     }
   }
   // components: {
@@ -290,5 +349,11 @@ computed: {
 .el-cascader{
   width: 250px;
   margin-left: 20px;
+}
+.el-tag {
+  margin:10px;
+}
+.el-input{
+  width:110px;
 }
 </style>
